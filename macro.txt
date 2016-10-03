@@ -1,0 +1,60 @@
+##############################################################
+##  Macro file for controlling the clusterReconstr program  ##
+##############################################################
+
+
+### Path of the input ROOT file containing the measurement data [string]:
+ROOTFILENAME = inputfiles/db02e_CBM06C6w5SM_pCS_bias140V_betasource_X0Y0Z24_colD3X0Y0Z-20_trs40mV_latency129.root
+
+### Path of the ROOT file containing the calibration data (enter "none" for no ADC->ke conversion) [string]:
+CALIBRATIONFILENAME = inputfiles/db02e_CBM06C6w5SM_pCS_bias140V_calibration_calibration_fit.root
+
+### Channel range to be processed [unsigned int]:
+CHANNEL_START = 1
+CHANNEL_END   = 64
+
+### Total number of bins [unsigned int]:
+NBINS = 256
+
+### Time cuts to be set [unsigned int]:
+TIMECUT_LOWER = 15
+TIMECUT_UPPER = 20
+
+### Maximally-allowed cluster size [unsigned int]:
+MAXCLUSTERSIZE = 2
+
+### Perform a common-mode correction? [yes/no]:
+COMMONMODECORRECTION = yes
+
+### Subtract the estimated background? [yes/no]:
+SUBTRACTBACKGROUND = yes
+
+### Scale cut value (for scaling the background estimation) [int]:
+SCALECUTVALUE = 10
+
+### Fit the signal with a Landau-Gauss convolution function? (Only makes sense if SUBTRACTBACKGROUND=yes) [yes/no]:
+LANGAUSFIT = yes
+
+###### Fit parameter ranges for Landau*Gauss fit [float]:
+### Scale parameter of Landau density (xi):
+LANGAUS_XI_LOWER = 0.25
+LANGAUS_XI_UPPER = 80.0
+### Most probable value of convolution (MPV):
+LANGAUS_MPV_LOWER = 5.0
+LANGAUS_MPV_UPPER = 250.0
+### Area (integral from -infinity to +infinity):
+LANGAUS_AREA_LOWER = 1.0
+LANGAUS_AREA_UPPER = 1000000
+### Sigma of Gauss distribution (sigmaG:
+LANGAUS_SIGMAG_LOWER = 0.4
+LANGAUS_SIGMAG_UPPER = 50.0
+
+###### Start values of Landau*Gauss fit [float]:
+### Scale parameter of Landau density (xi):
+LANGAUS_XI_INITIAL = 2.0
+### Most probable value of convolution (MPV):
+LANGAUS_MPV_INITIAL = 20.0
+### Area (integral from -infinity to +infinity):
+LANGAUS_AREA_INITIAL = 50000
+### Sigma of Gauss distribution (sigmaG):
+LANGAUS_SIGMAG_INITIAL = 5.0
