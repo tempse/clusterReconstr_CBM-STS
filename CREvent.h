@@ -22,8 +22,6 @@ class CREvent : public CREntry {
  public:
   //! Default constructor.
   CREvent() {};
-  /* //! Constructor which initializes the number-of-channels variable. */
-  /* CREvent(unsigned int newNChannels /\*!< Number of considered channels. *\/); */
   //! Constructor which initializes the variables nChannels and amplitudes (using an amplitude array).
   CREvent(unsigned int newNChannels, /*!< Number of considered channels. */
 	  float *newAmplitudes, /*!< The original amplitude array with newNBins entries. */
@@ -108,7 +106,6 @@ class CREvent : public CREntry {
    */
   float getAmplitude_at(unsigned int i /*!< Position of the amplitude value to be returned. */);
 
-  /* void writeCREvent(TString); */
   void printAmplitudes();
 
  private:

@@ -1,9 +1,5 @@
 #include "CREvent.h"
 
-// CREvent::CREvent(unsigned int newNChannels) {
-//   nChannels = newNChannels;
-// }
-
 CREvent::CREvent(unsigned int newNChannels, float *newAmplitudes, unsigned int newNBins) {
   nChannels = newNChannels;
   for(unsigned int i=0; i<newNBins; i++) {
@@ -106,27 +102,6 @@ float CREvent::getAmplitude_at(unsigned int i) {
   return amplitudes.at(i);
 }
 
-/*
-void CREvent::writeCREvent(TString fileName) {
-  TFile *outFile = new TFile(fileName, "RECREATE");
-  //unsigned int CREntries_size = (int)CREntries.size();
-  unsigned int currentStartChannel[CREntries.size()], currentClusterSize[CREntries.size()];
-  float currentAmplitudeOfCluster[CREntries.size()], currentSignificanceOfCluster[CREntries.size()];
-  TTree *treeCR = new TTree("treeCR","treeCR");
-  treeCR->Branch("startChannel",currentStartChannel);
-  treeCR->Branch("clusterSize",currentClusterSize);
-  treeCR->Branch("amplitudeOfCluster",currentAmplitudeOfCluster);
-  treeCR->Branch("significanceOfCluster",currentSignificanceOfCluster);
-  for(unsigned int i=0; i<CREntries.size(); i++) {
-    currentStartChannel[i] = CREntries.at(i).getStartChannel();
-    currentClusterSize[i] = CREntries.at(i).getClusterSize();
-    currentAmplitudeOfCluster[i] = CREntries.at(i).getAmplitudeOfCluster();
-    currentSignificanceOfCluster[i] = CREntries.at(i).getSignificanceOfCluster();
-  }
-  treeCR->Fill();
-  // treeCR->Write();
-}
-*/
 void CREvent::printAmplitudes() {
   for(std::vector<float>::iterator it=amplitudes.begin(); it!=amplitudes.end(); it++) {
     std::cout << *it << std::endl;

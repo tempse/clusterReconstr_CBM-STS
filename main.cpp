@@ -30,8 +30,6 @@
 #include "CREntry.h"
 #include "CREvent.h"
 
-//#include "read_treeCR.h"
-
 #include "langaufit.h"
 #include "langaufun.h"
 #include "langaupro.h"
@@ -344,20 +342,9 @@ int main(int argc, char** argv) {
   TH1F* hist_spectrum = new TH1F("hist_spectrum","",binnumber,min,max);
   TH1F* hist_background = new TH1F("hist_background","",binnumber,min,max);
 
-  // TFile *fileOutTree = new TFile("treeCR.root", "RECREATE");
-  // TTree* treeCR = new TTree("treeCR", "Tree containing cluster reconstruction data");
-  // int currentEventID[nChannels*maxClusterSize], currentStartChannel[nChannels*maxClusterSize], currentClusterSize[nChannels*maxClusterSize]; // reserve the maximum amount of space
-  // float currentAmplitudeOfCluster[nChannels*maxClusterSize], currentSignificanceOfCluster[nChannels*maxClusterSize]; // reserve the maximum amount of space
-  // treeCR->Branch("eventID",currentEventID);
-  // treeCR->Branch("startChannel",currentStartChannel);
-  // treeCR->Branch("clusterSize",currentClusterSize);
-  // treeCR->Branch("amplitudeOfCluster",currentAmplitudeOfCluster);
-  // treeCR->Branch("significanceOfCluster",currentSignificanceOfCluster);
-
   TH1F *hist_clusterSizeDistr = new TH1F("hist_clusterSizeDistr","",maxClusterSize,1,maxClusterSize+1);
 
   std::vector<CREvent> CREventCollection;
-  // std::vector<CREvent> CREventCollection_2SC;
 
 
  ///////////////////////////////////////////////////////////////////
@@ -406,55 +393,7 @@ int main(int argc, char** argv) {
 	}
       }
     }
-
-
-    // for(unsigned int clusterSize=1; clusterSize<=maxClusterSize; clusterSize++) {
-    //   TString outFileName = "treeCR_";
-    //   outFileName += clusterSize;
-    //   outFileName += "StripClusters.root";
-    //   TFile *outFile = new TFile(outFileName, "UPDATE");
-
-    //   TString treeName = clusterSize;
-    //   treeName += "StripClusters";
-    //   TTree *treeCR = new TTree(treeName, "");
-    //   treeCR->Branch("startChannel",currentStartChannel);
-    //   treeCR->Branch("clusterSize",currentClusterSize);
-    //   treeCR->Branch("amplitudeOfCluster",currentAmplitudeOfCluster);
-    //   treeCR->Branch("significanceOfCluster",currentSignificanceOfCluster);
-
-    //   for(unsigned int i=0; i<currentCREvent->getNumberOfCREntries(); i++) {
-    // 	if(currentCREvent->getCREntry(i).getClusterSize() == clusterSize) {
-    // 	  currentStartChannel[i] = currentCREvent->getCREntry(i).getStartChannel();
-    // 	  currentClusterSize[i] = currentCREvent->getCREntry(i).getClusterSize();
-    // 	  currentAmplitudeOfCluster[i] = currentCREvent->getCREntry(i).getAmplitudeOfCluster();
-    // 	  currentSignificanceOfCluster[i] = currentCREvent->getCREntry(i).getSignificanceOfCluster();
-    // 	}
-    //   }
-    //   treeCR->Fill();
-    //   treeCR->Write();
-    //   outFile->Close();
-    // }
-
-    /*
-      for(unsigned int i=0; i<currentCREvent->getNumberOfCREntries(); i++) {
-        currentEventID[i] = currentCREvent->getCREntry(i).getEventID();
-	currentStartChannel[i] = currentCREvent->getCREntry(i).getStartChannel();
-	currentClusterSize[i] = currentCREvent->getCREntry(i).getClusterSize();
-	currentAmplitudeOfCluster[i] = currentCREvent->getCREntry(i).getAmplitudeOfCluster();
-	currentSignificanceOfCluster[i] = currentCREvent->getCREntry(i).getSignificanceOfCluster();
-	}
-      for(unsigned int i=currentCREvent->getNumberOfCREntries(); i<nChannels*maxClusterSize; i++) {
-        currentEventID[i] = markerVal;
-	currentStartChannel[i] = markerVal;
-	currentClusterSize[i] = markerVal;
-	currentAmplitudeOfCluster[i] = markerVal;
-	currentSignificanceOfCluster[i] = markerVal;
-      }
-      treeCR->Fill();
-    */
     CREventCollection.push_back(*currentCREvent);
-
-    //CREventCollection_2SC.push_back(currentCREvent->getCREvent_forCS(2));
 
     // if(currentCREvent->getMostSignCREntry().getSignificanceOfCluster() > 3) // set threshold on SNR
       {
@@ -467,16 +406,11 @@ int main(int argc, char** argv) {
   std::cout << "\rGenerating cluster data... DONE "
 	    << "(time taken: " << (double)(clock()-tStart)/CLOCKS_PER_SEC << " seconds)" 
 	    << std::endl << std::endl;
-  
-  // std::cout << "Writing cluster data...";
-  // treeCR->Write();
-  // fileOutTree->Close();
-  // std::cout << " DONE" << std::endl;
 
-  // read_treeCR(nChannels, maxClusterSize, markerVal);
 
   ///////////////////////////////////////////////////////////////////
   
+
   
   unsigned int integral_upperBoundary = scaleCutValue-min;
   float scaleVal = (hist_spectrum->Integral(1,integral_upperBoundary))/(hist_background->Integral(1,integral_upperBoundary));
