@@ -1,13 +1,20 @@
 #include "CREvent.h"
 
-CREvent::CREvent(unsigned int newNChannels) {
-  nChannels = newNChannels;
-}
+// CREvent::CREvent(unsigned int newNChannels) {
+//   nChannels = newNChannels;
+// }
 
-CREvent::CREvent(unsigned int newNChannels, unsigned int newNBins, float *newAmplitudes) {
+CREvent::CREvent(unsigned int newNChannels, float *newAmplitudes, unsigned int newNBins) {
   nChannels = newNChannels;
   for(unsigned int i=0; i<newNBins; i++) {
     amplitudes.push_back(newAmplitudes[i]);
+  }
+}
+
+CREvent::CREvent(unsigned int newNChannels, std::vector<float> newAmplitudes) {
+  nChannels = newNChannels;
+  for(unsigned int i=0; i<newAmplitudes.size(); i++) {
+    amplitudes.push_back(newAmplitudes.at(i));
   }
 }
 
@@ -69,6 +76,34 @@ float CREvent::getLeastSignAmp_forCS(unsigned int clusterSize) const {
 
 CREntry CREvent::getCREntry(unsigned int i) const {
   return CREntries.at(i);
+}
+
+CREvent CREvent::getCREvent_forMaxCS(unsigned int maxClusterSize) {
+  CREvent *temp_CREvent = new CREvent(nChannels, amplitudes);
+  for(unsigned int i=0; i<CREntries.size(); i++) {
+    if(CREntries.at(i).getClusterSize() <= maxClusterSize) {
+      temp_CREvent->addCREntry(CREntries.at(i));
+    }
+  }
+  return *temp_CREvent;
+}
+
+CREvent CREvent::getCREvent_forCS(unsigned int clusterSize) {
+  CREvent *temp_CREvent = new CREvent(nChannels, amplitudes);
+  for(unsigned int i=0; i<CREntries.size(); i++) {
+    if(CREntries.at(i).getClusterSize() == clusterSize) {
+      temp_CREvent->addCREntry(CREntries.at(i));
+    }
+  }
+  return *temp_CREvent;
+}
+
+unsigned int CREvent::getAmplitudes_size() {
+  return (unsigned int)amplitudes.size();
+}
+
+float CREvent::getAmplitude_at(unsigned int i) {
+  return amplitudes.at(i);
 }
 
 /*

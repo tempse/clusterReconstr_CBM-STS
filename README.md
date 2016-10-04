@@ -1,7 +1,8 @@
 # clusterReconstr_CBM-STS
 
-*Disclaimer: This project is in its early stages and under heavy development.*
+A Cluster Reconstruction Algorithm for Silicon Microstrip Sensors as Used by the CBM-STS Collaboration at GSI/FAIR
 
+*Disclaimer: This project is in its early stages and under heavy development.*
 
 ## General remarks about the program:
 - The used ROOT version is 5.34/25.

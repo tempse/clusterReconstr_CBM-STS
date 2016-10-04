@@ -2,7 +2,6 @@
  * \brief This is the main routine of the cluster reconstruction algorithm. It reads a macro file, imports its parameters, performs the cluster reconstruction algorithm and outputs the results.
  *
  * \author Sebastian Templ <sebastian.templ@gmail.com>
- * \version 1.0
  * \date 2016
  */
 
@@ -358,6 +357,7 @@ int main(int argc, char** argv) {
   TH1F *hist_clusterSizeDistr = new TH1F("hist_clusterSizeDistr","",maxClusterSize,1,maxClusterSize+1);
 
   std::vector<CREvent> CREventCollection;
+  // std::vector<CREvent> CREventCollection_2SC;
 
 
  ///////////////////////////////////////////////////////////////////
@@ -390,7 +390,7 @@ int main(int argc, char** argv) {
       for(unsigned int i=0;i<nBins;i++) amplitude[i] -= median;
     }
 
-    CREvent *currentCREvent = new CREvent(nChannels, nBins, amplitude);
+    CREvent *currentCREvent = new CREvent(nChannels, amplitude, nBins);
 
     for(unsigned int channel=channel_startPos; channel<=channel_endPos; channel++) {
       for(unsigned int clusterSize=1; clusterSize<=maxClusterSize; clusterSize++) {
@@ -452,15 +452,15 @@ int main(int argc, char** argv) {
       }
       treeCR->Fill();
     */
-    // CREventCollection.push_back(*currentCREvent); //testing
+    CREventCollection.push_back(*currentCREvent);
 
-    //if(currentCREvent->getMostSignCREntry().getSignificanceOfCluster() > 3) 
+    //CREventCollection_2SC.push_back(currentCREvent->getCREvent_forCS(2));
+
+    // if(currentCREvent->getMostSignCREntry().getSignificanceOfCluster() > 3) // set threshold on SNR
       {
 	hist_clusterSizeDistr->Fill(currentCREvent->getMostSignCREntry().getClusterSize());
 	hist_spectrum->Fill(currentCREvent->getMostSignCREntry().getAmplitudeOfCluster());
 	hist_background->Fill(-currentCREvent->getLeastSignCREntry().getAmplitudeOfCluster());
-	// hist_spectrum->Fill(currentCREvent->getMostSignAmp_forCS(3));
-	// hist_background->Fill(-currentCREvent->getLeastSignAmp_forCS(3));
       }
     delete currentCREvent;
   }
@@ -543,8 +543,8 @@ int main(int argc, char** argv) {
     fitsnr->Draw("lsame");
   }
 
-  c->SaveAs("outputfiles/temp.root");
-  c->SaveAs("outputfiles/temp.pdf");
+  c->SaveAs("outputfiles/temp_signal.root");
+  c->SaveAs("outputfiles/temp_signal.pdf");
   
   TCanvas *c2 = new TCanvas();
   c2->SetGridy();
@@ -556,5 +556,29 @@ int main(int argc, char** argv) {
   c2->SaveAs("outputfiles/temp_clustDistr.pdf");
 
 
+  // generate the distribution of the eta variable:
+  std::vector<CREvent> CREventCollection_2SC;
+  for(unsigned int ev=0; ev<CREventCollection.size(); ev++) {
+    CREventCollection_2SC.push_back(CREventCollection.at(ev).getCREvent_forCS(2));
+  }
+  TH1F *hist_eta = new TH1F("hist_eta","",100,0,1);
+  for(unsigned int ev=0; ev<CREventCollection_2SC.size(); ev++) {
+    CREntry mostSignCREntry = CREventCollection_2SC.at(ev).getMostSignCREntry();
+    float amp_leftChannel = CREventCollection_2SC.at(ev).getAmplitude_at(mostSignCREntry.getStartChannel()-1);
+    float amp_rightChannel = CREventCollection_2SC.at(ev).getAmplitude_at(mostSignCREntry.getStartChannel());
+    float eta = amp_rightChannel/(amp_leftChannel+amp_rightChannel);
+    hist_eta->Fill(eta);
+  }
+  TCanvas *c3 = new TCanvas();
+  c3->SetGrid();
+  hist_eta->SetXTitle("#eta_{ (m=2)}");
+  hist_eta->SetYTitle("Counts");
+  hist_eta->GetYaxis()->SetTitleOffset(1.2);
+  hist_eta->SetStats(kFALSE);
+  hist_eta->Draw();
+  hist_eta->SaveAs("outputfiles/temp_hist_eta.root");
+  c3->SaveAs("outputfiles/temp_eta.pdf");
+  c3->SaveAs("outputfiles/temp_eta.root");
+  
   return 0;
 }

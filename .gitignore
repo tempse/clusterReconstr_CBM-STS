@@ -1,3 +1,11 @@
+# Custom files
+.depend
+clusterReconstr
+doc/*
+inputfiles/*
+outputfiles/*
+.gitmessage.txt
+
 # Compiled Object files
 *.slo
 *.lo

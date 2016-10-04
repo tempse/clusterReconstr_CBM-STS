@@ -21,7 +21,7 @@ TIMECUT_LOWER = 15
 TIMECUT_UPPER = 20
 
 ### Maximally-allowed cluster size [unsigned int]:
-MAXCLUSTERSIZE = 2
+MAXCLUSTERSIZE = 64
 
 ### Perform a common-mode correction? [yes/no]:
 COMMONMODECORRECTION = yes
@@ -33,7 +33,7 @@ SUBTRACTBACKGROUND = yes
 SCALECUTVALUE = 10
 
 ### Fit the signal with a Landau-Gauss convolution function? (Only makes sense if SUBTRACTBACKGROUND=yes) [yes/no]:
-LANGAUSFIT = yes
+LANGAUSFIT = no
 
 ###### Fit parameter ranges for Landau*Gauss fit [float]:
 ### Scale parameter of Landau density (xi):
