@@ -4,9 +4,11 @@ CREvent::CREvent(unsigned int newNChannels) {
   nChannels = newNChannels;
 }
 
-CREvent::CREvent(unsigned int newNChannels, float newAmplitudes[]) {
+CREvent::CREvent(unsigned int newNChannels, unsigned int newNBins, float *newAmplitudes) {
   nChannels = newNChannels;
-  amplitudes.assign(newAmplitudes, newAmplitudes+newNChannels);
+  for(unsigned int i=0; i<newNBins; i++) {
+    amplitudes.push_back(newAmplitudes[i]);
+  }
 }
 
 void CREvent::addCREntry(CREntry newCREntry) {

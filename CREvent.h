@@ -29,8 +29,9 @@ class CREvent : public CREntry {
   //! Constructor which initializes the number-of-channels variable.
   CREvent(unsigned int newNChannels /*!< Total number of considered channels. */);
   //! Constructor which initializes the variables nChannels and amplitudes.
-  CREvent(unsigned int newNChannels, /*!< Total number of considered channels. */
-	  float newAmplitudes[] /*!< The original amplitude array with newNChannels entries. */
+  CREvent(unsigned int newNChannels, /*!< Number of considered channels. */
+	  unsigned int newNBins, /*!< Total number of bins, i. e., connected read-out channels. */
+	  float *newAmplitudes /*!< The original amplitude array with newNBins entries. */
 	  );
   //! Default destructor.
   ~CREvent() {};

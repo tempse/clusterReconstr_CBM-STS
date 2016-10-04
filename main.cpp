@@ -390,7 +390,7 @@ int main(int argc, char** argv) {
       for(unsigned int i=0;i<nBins;i++) amplitude[i] -= median;
     }
 
-    CREvent *currentCREvent = new CREvent(nChannels, amplitude);
+    CREvent *currentCREvent = new CREvent(nChannels, nBins, amplitude);
 
     for(unsigned int channel=channel_startPos; channel<=channel_endPos; channel++) {
       for(unsigned int clusterSize=1; clusterSize<=maxClusterSize; clusterSize++) {
