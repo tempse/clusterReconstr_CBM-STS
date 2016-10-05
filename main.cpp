@@ -407,7 +407,7 @@ int main(int argc, char** argv) {
     CREventCollection.push_back(*currentCREvent);
 
     if(doSetSNRThreshold) {
-      if(currentCREvent->getMostSignCREntry().getSignificanceOfCluster() > 3) { // set SNR threshold
+      if(currentCREvent->getMostSignCREntry().getSignificanceOfCluster() >= SNRThreshold) { // set SNR threshold
 	hist_clusterSizeDistr->Fill(currentCREvent->getMostSignCREntry().getClusterSize());
 	hist_spectrum->Fill(currentCREvent->getMostSignCREntry().getAmplitudeOfCluster());
 	hist_background->Fill(-currentCREvent->getLeastSignCREntry().getAmplitudeOfCluster());
