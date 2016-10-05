@@ -41,6 +41,7 @@ int main(int argc, char** argv) {
   TString macroFileName;
   TString filename, calibrationFileName;
 
+  float SNRThreshold;
   Double_t sv[4], pllo[4], plhi[4], fp[4], fpe[4]; // parameters for Landau*Gauss fit
 
   // default values:
@@ -56,6 +57,7 @@ int main(int argc, char** argv) {
   bool doConvertADC = false;
   bool doSubtractBackground = true;
   bool doCommonModeCorrection = true;
+  bool doSetSNRThreshold = false;
   bool doLangausFit = false;
   bool isLangausXiLower = false;
   bool isLangausXiUpper = false;
@@ -201,6 +203,15 @@ int main(int argc, char** argv) {
 	  std::cout << "A common-mode correction won't be performed..." << std::endl;
 	}else {
 	  std::cout << "   WARNING: 'COMMONMODECORRECTION = " << value << "' is an invalid input. The default value will be used." << std::endl;
+	}
+      }
+      if(identifier == "SNRTHRESHOLD") {
+	if(value.IsDigit()) {
+	  doSetSNRThreshold = true;
+	  SNRThreshold = value.Atoi();
+	  std::cout << "SNR threshold set to " << SNRThreshold << "..." << std::endl;
+	}else {
+	  std::cout << "   WARNING: 'SNRTHRESHOLD = " << value << "' is an invalid input. No threshold set." << std::endl;
 	}
       }
       if(identifier == "SUBTRACTBACKGROUND") {
@@ -395,12 +406,17 @@ int main(int argc, char** argv) {
     }
     CREventCollection.push_back(*currentCREvent);
 
-    // if(currentCREvent->getMostSignCREntry().getSignificanceOfCluster() > 3) // set threshold on SNR
-      {
+    if(doSetSNRThreshold) {
+      if(currentCREvent->getMostSignCREntry().getSignificanceOfCluster() > 3) { // set SNR threshold
 	hist_clusterSizeDistr->Fill(currentCREvent->getMostSignCREntry().getClusterSize());
 	hist_spectrum->Fill(currentCREvent->getMostSignCREntry().getAmplitudeOfCluster());
 	hist_background->Fill(-currentCREvent->getLeastSignCREntry().getAmplitudeOfCluster());
       }
+    }else {
+      hist_clusterSizeDistr->Fill(currentCREvent->getMostSignCREntry().getClusterSize());
+      hist_spectrum->Fill(currentCREvent->getMostSignCREntry().getAmplitudeOfCluster());
+      hist_background->Fill(-currentCREvent->getLeastSignCREntry().getAmplitudeOfCluster());
+    }
     delete currentCREvent;
   }
   std::cout << "\rGenerating cluster data... DONE "
@@ -485,6 +501,7 @@ int main(int argc, char** argv) {
   hist_clusterSizeDistr->Scale(100/((float)hist_clusterSizeDistr->GetEntries())); // normalization and representation as percentage
   hist_clusterSizeDistr->SetXTitle("Multiplicity");
   hist_clusterSizeDistr->SetYTitle("Percentage");
+  hist_clusterSizeDistr->GetYaxis()->SetRangeUser(0,100);
   hist_clusterSizeDistr->Draw();
   hist_clusterSizeDistr->SaveAs("outputfiles/temp_clustDistr.root");
   c2->SaveAs("outputfiles/temp_clustDistr.pdf");

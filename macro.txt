@@ -21,10 +21,13 @@ TIMECUT_LOWER = 15
 TIMECUT_UPPER = 20
 
 ### Maximally-allowed cluster size [unsigned int]:
-MAXCLUSTERSIZE = 64
+MAXCLUSTERSIZE = 4
 
 ### Perform a common-mode correction? [yes/no]:
 COMMONMODECORRECTION = yes
+
+### Set a threshold on the SNR value (comment for not setting any threshold) [float]:
+SNRTHRESHOLD = 5
 
 ### Subtract the estimated background? [yes/no]:
 SUBTRACTBACKGROUND = yes
