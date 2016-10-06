@@ -23,7 +23,8 @@ class CREntry {
 	  unsigned int newStartChannel, /*!< Leftmost channel of the cluster. */
 	  unsigned int newClusterSize, /*!< Size of the cluster. */
 	  float newAmplitudeOfCluster, /*!< Amplitude of the cluster (sum of individual amplitudes) */
-	  float newSignificanceOfCluster); /*!< Significance of the cluster (cluster amplitude divided by the square root of the sum of the squared noise values in the cluster) */
+	  float newSignificanceOfCluster /*!< Significance of the cluster (cluster amplitude divided by the square root of the sum of the squared noise values in the cluster) */
+	  );
   //! Default destructor.
   ~CREntry() {};
 

@@ -17,6 +17,7 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TH1F.h>
+#include <TH2F.h>
 #include <TCanvas.h>
 #include <TLegend.h>
 #include <TMath.h>
@@ -489,7 +490,7 @@ int main(int argc, char** argv) {
     }
     hist_spectrum->SetYTitle("Counts / (#Delta amplitude)");
     hist_spectrum->GetYaxis()->SetTitleOffset(1.2);
-    hist_spectrum->Draw();
+    hist_spectrum->Draw("e1 x0");
     fitsnr->Draw("lsame");
   }
 
@@ -513,10 +514,12 @@ int main(int argc, char** argv) {
     CREventCollection_2SC.push_back(CREventCollection.at(ev).getCREvent_forCS(2));
   }
   TH1F *hist_eta = new TH1F("hist_eta","",100,0,1);
+  TH2F *hist_crosstalk = new TH2F("hist_crosstalk","",130,-10,120,130,-10,120);
   for(unsigned int ev=0; ev<CREventCollection_2SC.size(); ev++) {
     CREntry mostSignCREntry = CREventCollection_2SC.at(ev).getMostSignCREntry();
     float amp_leftChannel = CREventCollection_2SC.at(ev).getAmplitude_at(mostSignCREntry.getStartChannel()-1);
     float amp_rightChannel = CREventCollection_2SC.at(ev).getAmplitude_at(mostSignCREntry.getStartChannel());
+    hist_crosstalk->Fill(amp_rightChannel, amp_leftChannel);
     float eta = amp_rightChannel/(amp_leftChannel+amp_rightChannel);
     hist_eta->Fill(eta);
   }
@@ -530,6 +533,21 @@ int main(int argc, char** argv) {
   hist_eta->SaveAs("outputfiles/temp_hist_eta.root");
   c3->SaveAs("outputfiles/temp_eta.pdf");
   c3->SaveAs("outputfiles/temp_eta.root");
+
+  TCanvas *c4 = new TCanvas();
+  c4->SetGrid();
+  if(doConvertADC) {
+    hist_crosstalk->SetXTitle("a_{R} / (ke)");
+    hist_crosstalk->SetYTitle("a_{L} / (ke)");
+  }else {
+    hist_crosstalk->SetXTitle("a_{R} / (ADC)");
+    hist_crosstalk->SetYTitle("a_{L} / (ADC)");
+  }
+  hist_crosstalk->SetStats(kFALSE);
+  hist_crosstalk->Draw("colz");
+  c4->SaveAs("outputfiles/temp_crosstalk.pdf");
+  c4->SaveAs("outputfiles/temp_crosstalk.root");
+  hist_crosstalk->SaveAs("outputfiles/temp_hist_crosstalk.root");
   
   return 0;
 }

@@ -24,7 +24,7 @@ TIMECUT_UPPER = 20
 MAXCLUSTERSIZE = 4
 
 ### Perform a common-mode correction? [yes/no]:
-COMMONMODECORRECTION = yes
+COMMONMODECORRECTION = no
 
 ### Set a threshold on the SNR value (comment for not setting any threshold) [float]:
 SNRTHRESHOLD = 5
