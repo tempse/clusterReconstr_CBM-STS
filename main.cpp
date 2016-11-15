@@ -427,10 +427,10 @@ int main(int argc, char** argv) {
 
   ///////////////////////////////////////////////////////////////////
   
-
   
   unsigned int integral_upperBoundary = scaleCutValue-min;
   float scaleVal = (hist_spectrum->Integral(1,integral_upperBoundary))/(hist_background->Integral(1,integral_upperBoundary));
+  std::cout << "The scale value for the background distribution was calculated to be " << scaleVal << "..." << std::endl;
   hist_background->Scale(scaleVal);
   hist_background->Sumw2(); // necessary after histogram scaling
   TCanvas *c = new TCanvas();
@@ -513,26 +513,65 @@ int main(int argc, char** argv) {
   for(unsigned int ev=0; ev<CREventCollection.size(); ev++) {
     CREventCollection_2SC.push_back(CREventCollection.at(ev).getCREvent_forCS(2));
   }
-  TH1F *hist_eta = new TH1F("hist_eta","",100,0,1);
-  TH2F *hist_crosstalk = new TH2F("hist_crosstalk","",130,-10,120,130,-10,120);
+  int eta_bins = 100, eta_min = 0, eta_max = 1;
+  TH1F *hist_eta = new TH1F("hist_eta","",eta_bins,eta_min,eta_max);
+  TH1F *hist_eta_background = new TH1F("hist_eta_background","",eta_bins,eta_min,eta_max);
+  TH1F *hist_angular = new TH1F("hist_angular","",90,0,TMath::Pi()/2.);
+  int crosstalk_bins = 195, crosstalk_min = -10, crosstalk_max = 120;
+  if(doConvertADC) {
+    crosstalk_bins = 240;
+    crosstalk_min = -10;
+    crosstalk_max = 50;
+  }
+  TH2F *hist_crosstalk = new TH2F("hist_crosstalk","",crosstalk_bins,crosstalk_min,crosstalk_max,crosstalk_bins,crosstalk_min,crosstalk_max);
+  TH2F *hist_crosstalk_background = new TH2F("hist_crosstalk_background","",crosstalk_bins,crosstalk_min,crosstalk_max,crosstalk_bins,crosstalk_min,crosstalk_max);
   for(unsigned int ev=0; ev<CREventCollection_2SC.size(); ev++) {
     CREntry mostSignCREntry = CREventCollection_2SC.at(ev).getMostSignCREntry();
+    CREntry leastSignCREntry = CREventCollection_2SC.at(ev).getLeastSignCREntry();
     float amp_leftChannel = CREventCollection_2SC.at(ev).getAmplitude_at(mostSignCREntry.getStartChannel()-1);
     float amp_rightChannel = CREventCollection_2SC.at(ev).getAmplitude_at(mostSignCREntry.getStartChannel());
-    hist_crosstalk->Fill(amp_rightChannel, amp_leftChannel);
     float eta = amp_rightChannel/(amp_leftChannel+amp_rightChannel);
-    hist_eta->Fill(eta);
+    if(amp_leftChannel*amp_leftChannel+amp_rightChannel*amp_rightChannel >= 20*20) { //simple approach: just cut away background part within a circle of radius 20
+      hist_crosstalk->Fill(amp_rightChannel, amp_leftChannel);
+      hist_angular->Fill(TMath::ATan(amp_leftChannel/amp_rightChannel));
+      hist_eta->Fill(eta);
+    }
+    float amp_leftChannel_background = CREventCollection_2SC.at(ev).getAmplitude_at(leastSignCREntry.getStartChannel()-1);
+    float amp_rightChannel_background = CREventCollection_2SC.at(ev).getAmplitude_at(leastSignCREntry.getStartChannel());
+    hist_crosstalk_background->Fill(-amp_rightChannel_background, -amp_leftChannel_background);
+    float eta_background = amp_rightChannel_background/(amp_leftChannel_background+amp_rightChannel_background);
+    hist_eta_background->Fill(eta_background);   
   }
+
+  hist_crosstalk_background->Scale(scaleVal);
+  hist_crosstalk_background->Sumw2();
+  //hist_crosstalk->Add(hist_crosstalk_background,-1);
+
+  hist_eta_background->Scale(scaleVal);
+  hist_eta_background->Sumw2();
+  //hist_eta->Add(hist_eta_background,-1);
+
   TCanvas *c3 = new TCanvas();
   c3->SetGrid();
   hist_eta->SetXTitle("#eta_{ (m=2)}");
   hist_eta->SetYTitle("Counts");
   hist_eta->GetYaxis()->SetTitleOffset(1.2);
   hist_eta->SetStats(kFALSE);
-  hist_eta->Draw();
+  hist_eta->Draw("e");
   hist_eta->SaveAs("outputfiles/temp_hist_eta.root");
   c3->SaveAs("outputfiles/temp_eta.pdf");
   c3->SaveAs("outputfiles/temp_eta.root");
+
+  TCanvas *c3_2 = new TCanvas();
+  c3_2->SetGrid();
+  hist_eta_background->SetXTitle("#eta_{ (m=2)}");
+  hist_eta_background->SetYTitle("Counts");
+  hist_eta_background->GetYaxis()->SetTitleOffset(1.2);
+  hist_eta_background->SetStats(kFALSE);
+  hist_eta_background->Draw("e");
+  hist_eta_background->SaveAs("outputfiles/temp_hist_eta_background.root");
+  c3_2->SaveAs("outputfiles/temp_eta_background.pdf");
+  c3_2->SaveAs("outputfiles/temp_eta_background.root.");
 
   TCanvas *c4 = new TCanvas();
   c4->SetGrid();
@@ -548,6 +587,32 @@ int main(int argc, char** argv) {
   c4->SaveAs("outputfiles/temp_crosstalk.pdf");
   c4->SaveAs("outputfiles/temp_crosstalk.root");
   hist_crosstalk->SaveAs("outputfiles/temp_hist_crosstalk.root");
+
   
+  TCanvas *c5 = new TCanvas();
+  c5->SetGrid();
+  if(doConvertADC) {
+    hist_crosstalk_background->SetXTitle("a_{R} / (ke)");
+    hist_crosstalk_background->SetYTitle("a_{L} / (ke)");
+  }else {
+    hist_crosstalk_background->SetXTitle("a_{R} / (ADC)");
+    hist_crosstalk_background->SetYTitle("a_{L} / (ADC)");
+  }
+  hist_crosstalk_background->SetStats(kFALSE);
+  hist_crosstalk_background->Draw("colz");
+  c5->SaveAs("outputfiles/temp_crosstalk_background.pdf");
+  c5->SaveAs("outputfiles/temp_crosstalk_background.root");
+  hist_crosstalk_background->SaveAs("outputfiles/temp_hist_crosstalk_background.root");
+  
+  TCanvas *c6 = new TCanvas();
+  c6->SetGrid();
+  hist_angular->SetXTitle("Angle");
+  hist_angular->SetYTitle("Counts");
+  hist_angular->SetStats(kFALSE);
+  hist_angular->Draw("e");
+  c6->SaveAs("outputfiles/temp_angular.pdf");
+  c6->SaveAs("outputfiles/temp_angular.root");
+  hist_angular->SaveAs("outputfiles/temp_hist_angular.root");
+
   return 0;
 }
