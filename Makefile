@@ -9,7 +9,7 @@ DOXY=doxygen
 DOCDIR=doc
 
 
-SRCS=main.cpp CREntry.cpp CREvent.cpp langaufun.cpp langaufit.cpp langaupro.cpp
+SRCS=main.cpp CRprintInfo.cpp CREntry.cpp CREvent.cpp langaufun.cpp langaufit.cpp langaupro.cpp
 OBJS=$(subst .cpp,.o,$(SRCS))
 
 all: $(EXECUTABLE)

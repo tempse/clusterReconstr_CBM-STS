@@ -28,6 +28,8 @@
 #include <TF1.h>
 #include <TColor.h>
 
+#include "CRprintInfo.h"
+
 #include "CREntry.h"
 #include "CREvent.h"
 
@@ -48,7 +50,7 @@ int main(int argc, char** argv) {
   // default values:
   TString outFileName = "output_";
   size_t nBins = 256;
-  unsigned int channel_startPos = 0;
+  unsigned int channel_startPos = 1;
   unsigned int channel_endPos   = 256;
   unsigned int timeCut_lower = 0;
   unsigned int timeCut_upper = 25;
@@ -103,7 +105,7 @@ int main(int argc, char** argv) {
       std::cout << "   ERROR: Macro file " << macroFileName << " cannot be opened." << std::endl;
       return 2;
     }
-    std::cout << std::endl;
+    std::cout << "Setting parameters now..." << std::endl << std::endl;
     std::string currentLine_temp;
     while(std::getline(macroFile, currentLine_temp)) {
       TString currentLine = currentLine_temp;
@@ -134,7 +136,7 @@ int main(int argc, char** argv) {
       if(identifier == "CHANNEL_START") {
 	if(value.IsDigit()) {
 	  channel_startPos = value.Atoi();
-	  std::cout << "First channel number set to " << channel_startPos << "..." << std::endl;
+	  //std::cout << "First channel number set to " << channel_startPos << "..." << std::endl;
 	}else {
 	  std::cout << "   ERROR: 'CHANNEL_START = " << value << "' is an invalid input." << std::endl;
 	  return 3;
@@ -143,7 +145,7 @@ int main(int argc, char** argv) {
       if(identifier == "CHANNEL_END") {
 	if(value.IsDigit()) {
 	  channel_endPos = value.Atoi();
-	  std::cout << "Last channel number set to " << channel_endPos << "..." << std::endl;
+	  //std::cout << "Last channel number set to " << channel_endPos << "..." << std::endl;
 	}else {
 	  std::cout << "   ERROR: 'CHANNEL_END = " << value << "' is an invalid input." << std::endl;
 	  return 3;
@@ -152,7 +154,7 @@ int main(int argc, char** argv) {
       if(identifier == "NBINS") {
 	if(value.IsDigit()) {
 	  nBins = value.Atoi();
-	  std::cout << "Total number of bins set to " << nBins << "..." << std::endl;
+	  //std::cout << "Total number of bins set to " << nBins << "..." << std::endl;
 	}else {
 	  std::cout << "   WARNING: 'NBINS = " << value << "' is an invalid input. The default value will be used." << std::endl;
 	}
@@ -162,7 +164,7 @@ int main(int argc, char** argv) {
 	  isSetTimeCuts = true;
 	  isSetTimeCut_lower = true;
 	  timeCut_lower = value.Atoi();
-	  std::cout << "Lower time cut value set to " << timeCut_lower << "..." << std::endl;
+	  //std::cout << "Lower time cut value set to " << timeCut_lower << "..." << std::endl;
 	  if(isSetTimeCut_upper && (timeCut_lower >= timeCut_upper)) {
 	    std::cout << "   ERROR: Invalid input for the time cut values." << std::endl;
 	    return 3;
@@ -176,7 +178,7 @@ int main(int argc, char** argv) {
 	  isSetTimeCuts = true;
 	  isSetTimeCut_upper = true;
 	  timeCut_upper = value.Atoi();
-	  std::cout << "Upper time cut value set to " << timeCut_upper << "..." << std::endl;
+	  //std::cout << "Upper time cut value set to " << timeCut_upper << "..." << std::endl;
 	  if(isSetTimeCut_lower && (timeCut_lower >= timeCut_upper)) {
 	    std::cout << "   ERROR: Invalid input for the time cut values." << std::endl;
 	    return 3;
@@ -188,7 +190,7 @@ int main(int argc, char** argv) {
       if(identifier == "MAXCLUSTERSIZE") {
 	if(value.IsDigit()) {
 	  maxClusterSize = value.Atoi();
-	  std::cout << "Maximum cluster size set to " << maxClusterSize << "..." << std::endl;
+	  //std::cout << "Maximum cluster size set to " << maxClusterSize << "..." << std::endl;
 	}else {
 	  std::cout << "   ERROR: 'MAXCLUSTERSIZE = " << value << "' is an invalid input." << std::endl;
 	  return 3;
@@ -198,10 +200,10 @@ int main(int argc, char** argv) {
 	value.ToLower();
 	if(value == "yes") {
 	  doCommonModeCorrection = true;
-	  std::cout << "A common-mode correction will be performed..." << std::endl;
+	  //std::cout << "A common-mode correction will be performed..." << std::endl;
 	}else if(value == "no") {
 	  doCommonModeCorrection = false;
-	  std::cout << "A common-mode correction won't be performed..." << std::endl;
+	  //std::cout << "A common-mode correction won't be performed..." << std::endl;
 	}else {
 	  std::cout << "   WARNING: 'COMMONMODECORRECTION = " << value << "' is an invalid input. The default value will be used." << std::endl;
 	}
@@ -210,7 +212,7 @@ int main(int argc, char** argv) {
 	if(value.IsDigit()) {
 	  doSetSNRThreshold = true;
 	  SNRThreshold = value.Atoi();
-	  std::cout << "SNR threshold set to " << SNRThreshold << "..." << std::endl;
+	  //std::cout << "SNR threshold set to " << SNRThreshold << "..." << std::endl;
 	}else {
 	  std::cout << "   WARNING: 'SNRTHRESHOLD = " << value << "' is an invalid input. No threshold set." << std::endl;
 	}
@@ -219,10 +221,10 @@ int main(int argc, char** argv) {
 	value.ToLower();
 	if(value == "yes") {
 	  doSubtractBackground = true;
-	  std::cout << "The estimated background will be subtracted..." << std::endl;
+	  //std::cout << "The estimated background will be subtracted..." << std::endl;
 	}else if(value == "no") {
 	  doSubtractBackground = false;
-	  std::cout << "The estimated background won't be subtracted..." << std::endl;
+	  //std::cout << "The estimated background won't be subtracted..." << std::endl;
 	}else {
 	  std::cout << "   WARNING: 'SUBTRACTBACKGROUND = " << value << "' is an invalid input. The default value will be used." << std::endl;
 	}
@@ -230,7 +232,7 @@ int main(int argc, char** argv) {
       if(identifier == "SCALECUTVALUE") {
 	if(value.IsDigit()) {
 	  scaleCutValue = value.Atoi();
-	  std::cout << "Scale cut value set to " << scaleCutValue << "..." << std::endl;
+	  //std::cout << "Scale cut value set to " << scaleCutValue << "..." << std::endl;
 	}else {
 	  std::cout << "   WARNING: 'SCALECUTVALUE = " << value << "' is an invalid input. The default value will be used." << std::endl;
 	}
@@ -239,10 +241,10 @@ int main(int argc, char** argv) {
 	value.ToLower();
 	if(value == "yes") {
 	  doLangausFit = true;
-	  std::cout << "A fit with a Landau-Gauss convolution function will be performed..." << std::endl;
+	  //std::cout << "A fit with a Landau-Gauss convolution function will be performed..." << std::endl;
 	}else if(value == "no") {
 	  doLangausFit = false;
-	  std::cout << "A fit with a Landau-Gauss convolution function won't be performed..." << std::endl;
+	  //std::cout << "A fit with a Landau-Gauss convolution function won't be performed..." << std::endl;
 	}else {
 	  std::cout << "   WARNING: 'LANGAUSFIT = " << value << "' is an invalid input. The default value will be used." << std::endl;
 	}
@@ -312,15 +314,38 @@ int main(int argc, char** argv) {
   }
   if(doLangausFit) {
     if(isLangausRanges && isLangausStartValues) {
-      std::cout << "Parameters for the Landau*Gauss fit set..." << std::endl;
+      //std::cout << "Parameters for the Landau*Gauss fit set..." << std::endl;
     }else if(!isLangausRanges) {
       std::cout << "   WARNING: Not all ranges for the Landau*Gauss fit were set properly. Default values will be used." << std::endl;
     }else if(!isLangausStartValues) {
       std::cout << "   WARNING: Not all start values for the Landau*Gauss fit were set properly. Default values will be used." << std::endl;
     }
   }
-  std::cout << std::endl << "All parameters set..." << std::endl;
+  std::cout << "All parameters set." << std::endl << std::endl;
+  std::cout << "Summary of input values:" << std::endl;
 
+
+  // output status and parameters:
+  CRprintInfo(doConvertADC, "ADC->ke conversion using calibration file");
+  CRprintInfo(doCommonModeCorrection, "Common-mode correction");
+  CRprintInfo(doSubtractBackground, "Background subtraction");
+  CRprintInfo(doLangausFit, "Landau*Gauss fit to signal distribution");
+  CRprintInfo((doLangausFit && isLangausRanges && isLangausStartValues), "All parameters for the Landau*Gauss fit set successfully");
+  CRprintInfo(doSetSNRThreshold, "SNR threshold setting");
+  if(doSetSNRThreshold) {
+    CRprintInfo(SNRThreshold, "SNR threshold value");
+  }
+  CRprintInfo(isSetTimeCuts, "Time cuts setting");
+  if(isSetTimeCuts) {
+    CRprintInfo(timeCut_lower, "Lower time cut value");
+    CRprintInfo(timeCut_upper, "Upper time cut value");
+  }
+  CRprintInfo(channel_startPos, "First channel number");
+  CRprintInfo(channel_endPos, "Last channel number");
+  CRprintInfo((int)nBins, "Total number of bins");
+  CRprintInfo(maxClusterSize, "Maximally-allowed cluster multiplicity");
+  CRprintInfo(scaleCutValue, "Scale cut value");
+  
 
   ///////////////////////////////////////////////////////////////////
   
@@ -430,7 +455,7 @@ int main(int argc, char** argv) {
   
   unsigned int integral_upperBoundary = scaleCutValue-min;
   float scaleVal = (hist_spectrum->Integral(1,integral_upperBoundary))/(hist_background->Integral(1,integral_upperBoundary));
-  std::cout << "The scale value for the background distribution was calculated to be " << scaleVal << "..." << std::endl;
+  CRprintInfo(scaleVal, "Calculated scale value for the background distribution");
   hist_background->Scale(scaleVal);
   hist_background->Sumw2(); // necessary after histogram scaling
   TCanvas *c = new TCanvas();
