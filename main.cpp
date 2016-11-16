@@ -380,6 +380,7 @@ int main(int argc, char** argv) {
   TH1F* hist_background = new TH1F("hist_background","",binnumber,min,max);
 
   TH1F *hist_clusterSizeDistr = new TH1F("hist_clusterSizeDistr","",maxClusterSize,1,maxClusterSize+1);
+  TH1F *hist_clusterSizeDistr_background = new TH1F("hist_clusterSizeDistr_background","",maxClusterSize,1,maxClusterSize+1);
 
   std::vector<CREvent> CREventCollection;
 
@@ -435,11 +436,13 @@ int main(int argc, char** argv) {
     if(doSetSNRThreshold) {
       if(currentCREvent->getMostSignCREntry().getSignificanceOfCluster() >= SNRThreshold) { // set SNR threshold
 	hist_clusterSizeDistr->Fill(currentCREvent->getMostSignCREntry().getClusterSize());
+	hist_clusterSizeDistr_background->Fill(currentCREvent->getLeastSignCREntry().getClusterSize());
 	hist_spectrum->Fill(currentCREvent->getMostSignCREntry().getAmplitudeOfCluster());
 	hist_background->Fill(-currentCREvent->getLeastSignCREntry().getAmplitudeOfCluster());
       }
     }else {
       hist_clusterSizeDistr->Fill(currentCREvent->getMostSignCREntry().getClusterSize());
+      hist_clusterSizeDistr_background->Fill(currentCREvent->getLeastSignCREntry().getClusterSize());
       hist_spectrum->Fill(currentCREvent->getMostSignCREntry().getAmplitudeOfCluster());
       hist_background->Fill(-currentCREvent->getLeastSignCREntry().getAmplitudeOfCluster());
     }
@@ -457,6 +460,7 @@ int main(int argc, char** argv) {
   float scaleVal = (hist_spectrum->Integral(1,integral_upperBoundary))/(hist_background->Integral(1,integral_upperBoundary));
   CRprintInfo(scaleVal, "Calculated scale value for the background distribution");
   hist_background->Scale(scaleVal);
+  hist_clusterSizeDistr_background->Scale(scaleVal);
   hist_background->Sumw2(); // necessary after histogram scaling
   TCanvas *c = new TCanvas("c","",800,600);
   c->SetGrid();
@@ -466,6 +470,7 @@ int main(int argc, char** argv) {
 
   if(doSubtractBackground) {
     hist_spectrum->Add(hist_background,-1);
+    hist_clusterSizeDistr->Add(hist_clusterSizeDistr_background,-1);
     for(unsigned int i=1;i<=hist_spectrum->GetNbinsX();i++) {
       hist_spectrum->SetBinError(i,TMath::Sqrt(TMath::Power(hist_spectrum->GetBinError(i),2) + TMath::Power(hist_background->GetBinError(i),2)));
     }
