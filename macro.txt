@@ -35,7 +35,7 @@ SUBTRACTBACKGROUND = yes
 ### Scale cut value (for scaling the background estimation) [int]:
 SCALECUTVALUE = 10
 
-### Fit the signal with a Landau-Gauss convolution function? (Only makes sense if SUBTRACTBACKGROUND=yes) [yes/no]:
+### Fit the signal with a Landau-Gauss convolution function? (Only makes sense if the background has gotten rid of) [yes/no]:
 LANGAUSFIT = no
 
 ###### Fit parameter ranges for Landau*Gauss fit [float]:
