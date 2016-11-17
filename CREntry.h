@@ -28,7 +28,7 @@ class CREntry {
   //! Default destructor.
   ~CREntry() {};
 
-  CREntry operator=(const CREntry&); //!< The '=' operator compares all (private) variables seperately.
+  CREntry operator=(const CREntry&); //!< The '=' operator assigns all (private) variables separately.
 
   //! Function to set the variable eventID.
   void setEventID(unsigned int newEventID /*!< New event number. */);
