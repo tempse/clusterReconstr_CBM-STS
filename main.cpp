@@ -384,6 +384,15 @@ int main(int argc, char** argv) {
 
   std::vector<CREvent> CREventCollection;
 
+  // Import and store ADC->ke conversion values and convert the noise distribution, if the option is enabled:
+  float slopePerChannel[nBins];
+  if(doConvertADC) {
+    for(unsigned int i=0; i<nBins; i++) {
+      treeCalibr->GetEvent(i);
+      slopePerChannel[i] = slope_calibr;
+      hist_noise->SetBinContent(i+1, hist_noise->GetBinContent(i+1)/slopePerChannel[i]);
+    }
+  }
 
  ///////////////////////////////////////////////////////////////////
 
@@ -396,9 +405,8 @@ int main(int argc, char** argv) {
     tree->GetEvent(ev);
 
     if(doConvertADC) {
-      for(unsigned int channel=channel_startPos; channel<=channel_endPos; channel++) {
-	treeCalibr->GetEvent(channel-1);
-	amplitude[channel-1] /= slope_calibr;
+      for(unsigned int i=0; i<nBins; i++) {
+	amplitude[i] /= slopePerChannel[i];
       }
     }
     
@@ -458,7 +466,7 @@ int main(int argc, char** argv) {
   
   unsigned int integral_upperBoundary = scaleCutValue-min;
   float scaleVal = (hist_spectrum->Integral(1,integral_upperBoundary))/(hist_background->Integral(1,integral_upperBoundary));
-  CRprintInfo(scaleVal, "Calculated scale value for the background distribution");
+  if(doSubtractBackground) CRprintInfo(scaleVal, "Calculated scale value for the background distribution");
   hist_background->Scale(scaleVal);
   hist_clusterSizeDistr_background->Scale(scaleVal);
   hist_background->Sumw2(); // necessary after histogram scaling
@@ -483,7 +491,7 @@ int main(int argc, char** argv) {
 
     // Setting fit range and start values
     Double_t fr[2];
-    fr[0]=0.25*hist_spectrum->GetMean();
+    fr[0]=0.35*hist_spectrum->GetMean();
     fr[1]=3.0*hist_spectrum->GetMean();
 
     // "Width","MP","Area","GSigma":
@@ -538,7 +546,7 @@ int main(int argc, char** argv) {
   c2->SaveAs("outputfiles/temp_clustDistr.pdf");
 
 
-  // generate the distribution of the eta variable:
+  // generate further plots related to the charge distribution of two-strip-cluster events:
   std::vector<CREvent> CREventCollection_2SC;
   for(unsigned int ev=0; ev<CREventCollection.size(); ev++) {
     CREventCollection_2SC.push_back(CREventCollection.at(ev).getCREvent_forCS(2));
@@ -547,13 +555,13 @@ int main(int argc, char** argv) {
   TH1F *hist_eta = new TH1F("hist_eta","",eta_bins,eta_min,eta_max);
   TH1F *hist_eta_background = new TH1F("hist_eta_background","",eta_bins,eta_min,eta_max);
   TH1F *hist_angular = new TH1F("hist_angular","",90,0,TMath::Pi()/2.);
-  int crosstalk_bins = 90, 
+  int crosstalk_bins = 130, 
     crosstalk_min = -10, 
     crosstalk_max = 120;
   if(doConvertADC) {
-    crosstalk_bins = 90;
-    crosstalk_min = -10;
-    crosstalk_max = 50;
+    crosstalk_bins = 130;
+    crosstalk_min = -5;
+    crosstalk_max = 55;
   }
   TH2F *hist_crosstalk = new TH2F("hist_crosstalk","",crosstalk_bins,crosstalk_min,crosstalk_max,crosstalk_bins,crosstalk_min,crosstalk_max);
   TH2F *hist_crosstalk_background = new TH2F("hist_crosstalk_background","",crosstalk_bins,crosstalk_min,crosstalk_max,crosstalk_bins,crosstalk_min,crosstalk_max);
@@ -567,7 +575,7 @@ int main(int argc, char** argv) {
       hist_crosstalk->Fill(amp_rightChannel, amp_leftChannel);
       hist_angular->Fill(TMath::ATan(amp_leftChannel/amp_rightChannel));
       hist_eta->Fill(eta);
-    }else if(!doSetSNRThreshold && amp_leftChannel*amp_leftChannel+amp_rightChannel*amp_rightChannel >= 20*20) { //simple approach: just cut away background part within a circle of radius 20
+    }else if(!doSetSNRThreshold && amp_leftChannel*amp_leftChannel+amp_rightChannel*amp_rightChannel >= 400) { //dirty approach: just cut away background part within a circle of certain radius
       hist_crosstalk->Fill(amp_rightChannel, amp_leftChannel);
       hist_angular->Fill(TMath::ATan(amp_leftChannel/amp_rightChannel));
       hist_eta->Fill(eta);
