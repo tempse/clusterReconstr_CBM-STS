@@ -19,6 +19,7 @@
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TCanvas.h>
+#include <TLatex.h>
 #include <TLegend.h>
 #include <TMath.h>
 #include <TStyle.h>
@@ -656,7 +657,23 @@ int main(int argc, char** argv) {
   hist_angular->SetXTitle("Angle");
   hist_angular->SetYTitle("Counts");
   hist_angular->SetStats(kFALSE);
+  TF1 *gausfit_lowertheta = new TF1("gausfit_lowertheta","[0]*exp(-.5*((x-[1])/[2])**2)",.04,.348);
+  gausfit_lowertheta->SetParameters(100.,.2,.1);
+  hist_angular->Fit("gausfit_lowertheta","","",.04,.348);
+  TF1 *gausfit_uppertheta = new TF1("gausfit_uppertheta","[0]*exp(-.5*((x-[1])/[2])**2)",1.224,1.53);
+  gausfit_uppertheta->SetParameters(180.,1.4,.1);
+  hist_angular->Fit("gausfit_uppertheta","+","",1.224,1.53);
   hist_angular->Draw("e");
+  TLatex latex;
+  char mu_1[45], mu_2[45], sigma_1[45], sigma_2[45];
+  sprintf(mu_1,"#scale[.75]{#color[2]{#mu_{1} = %.3f}}",gausfit_lowertheta->GetParameter(1));
+  sprintf(mu_2,"#scale[.75]{#color[2]{#mu_{2} = %.3f}}",gausfit_uppertheta->GetParameter(1));
+  sprintf(sigma_1,"#scale[.75]{#color[2]{#sigma_{1} = %.3f}}",gausfit_lowertheta->GetParameter(2));
+  sprintf(sigma_2,"#scale[.75]{#color[2]{#sigma_{2} = %.3f}}",gausfit_uppertheta->GetParameter(2));
+  latex.DrawLatex(.1,205,mu_1);
+  latex.DrawLatex(.1,185,sigma_1);
+  latex.DrawLatex(.95,205,mu_2);
+  latex.DrawLatex(.95,185,sigma_2);
   c6->SaveAs("outputfiles/temp_angular.pdf");
   c6->SaveAs("outputfiles/temp_angular.root");
   hist_angular->SaveAs("outputfiles/temp_hist_angular.root");
