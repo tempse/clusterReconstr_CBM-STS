@@ -5,8 +5,7 @@ A Cluster Reconstruction Algorithm for Silicon Microstrip Sensors as Used by the
 *Disclaimer: This project is in its early stages and under heavy development.*
 
 ## General remarks about the program:
-- The used ROOT version is 5.34/25.
-- The used RooFit version is v3.60.
+- The used ROOT version is 6.08/00.
 - A Doxyfile is provided so that a documentation can easily be generated using Doxygen.
 
 ## How to run the program
