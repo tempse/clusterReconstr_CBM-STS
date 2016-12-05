@@ -570,7 +570,7 @@ int main(int argc, char** argv) {
   int eta_bins = 100, eta_min = 0, eta_max = 1;
   TH1F *hist_eta = new TH1F("hist_eta","",eta_bins,eta_min,eta_max);
   TH1F *hist_eta_background = new TH1F("hist_eta_background","",eta_bins,eta_min,eta_max);
-  TH1F *hist_angular = new TH1F("hist_angular","",90,0,TMath::Pi()/2.);
+  TH1F *hist_angular = new TH1F("hist_angular","",90,0,1/2.);
   int crosstalk_bins = 130, 
     crosstalk_min = -10, 
     crosstalk_max = 120;
@@ -589,11 +589,11 @@ int main(int argc, char** argv) {
     float eta = amp_rightChannel/(amp_leftChannel+amp_rightChannel);
     if(doSetSNRThreshold && CREventCollection_2SC.at(ev).getMostSignCREntry().getSignificanceOfCluster() >= SNRThreshold) { //set SNR threshold
       hist_crosstalk->Fill(amp_rightChannel, amp_leftChannel);
-      hist_angular->Fill(TMath::ATan(amp_leftChannel/amp_rightChannel));
+      hist_angular->Fill(TMath::ATan(amp_leftChannel/amp_rightChannel)/(TMath::Pi()));
       hist_eta->Fill(eta);
     }else if(!doSetSNRThreshold && amp_leftChannel*amp_leftChannel+amp_rightChannel*amp_rightChannel >= 400) { //dirty approach: just cut away background part within a circle of certain radius
       hist_crosstalk->Fill(amp_rightChannel, amp_leftChannel);
-      hist_angular->Fill(TMath::ATan(amp_leftChannel/amp_rightChannel));
+      hist_angular->Fill(TMath::ATan(amp_leftChannel/amp_rightChannel)/(TMath::Pi()));
       hist_eta->Fill(eta);
     }
     if(doSubtractBackground) {
@@ -669,26 +669,31 @@ int main(int argc, char** argv) {
   
   TCanvas *c6 = new TCanvas("c6","",800,600);
   c6->SetGrid();
-  hist_angular->SetXTitle("Angle");
+  hist_angular->SetXTitle("#theta/#pi");
   hist_angular->SetYTitle("Counts");
+  hist_angular->GetYaxis()->SetTitleOffset(1.2);
   hist_angular->SetStats(kFALSE);
-  TF1 *gausfit_lowertheta = new TF1("gausfit_lowertheta","[0]*exp(-.5*((x-[1])/[2])**2)",.04,.348);
-  gausfit_lowertheta->SetParameters(100.,.2,.1);
-  hist_angular->Fit("gausfit_lowertheta","","",.04,.348);
-  TF1 *gausfit_uppertheta = new TF1("gausfit_uppertheta","[0]*exp(-.5*((x-[1])/[2])**2)",1.224,1.53);
-  gausfit_uppertheta->SetParameters(180.,1.4,.1);
-  hist_angular->Fit("gausfit_uppertheta","+","",1.224,1.53);
+  float leftPeak_fitRange_start = .021,
+    leftPeak_fitRange_end = .101,
+    rightPeak_fitRange_start = .4,
+    rightPeak_fitRange_end = .48;
+    TF1 *gausfit_lowertheta = new TF1("gausfit_lowertheta","[0]*exp(-.5*((x-[1])/[2])**2)",leftPeak_fitRange_start,leftPeak_fitRange_end);
+  gausfit_lowertheta->SetParameters(100.,.06,.03);
+  hist_angular->Fit("gausfit_lowertheta","","",leftPeak_fitRange_start,leftPeak_fitRange_end);
+  TF1 *gausfit_uppertheta = new TF1("gausfit_uppertheta","[0]*exp(-.5*((x-[1])/[2])**2)",rightPeak_fitRange_start,rightPeak_fitRange_end);
+  gausfit_uppertheta->SetParameters(180.,.45,.03);
+  hist_angular->Fit("gausfit_uppertheta","+","",rightPeak_fitRange_start,rightPeak_fitRange_end);
   hist_angular->Draw("e");
   TLatex latex;
-  char mu_1[45], mu_2[45], sigma_1[45], sigma_2[45];
-  sprintf(mu_1,"#scale[.75]{#color[2]{#mu_{1} = %.3f}}",gausfit_lowertheta->GetParameter(1));
-  sprintf(mu_2,"#scale[.75]{#color[2]{#mu_{2} = %.3f}}",gausfit_uppertheta->GetParameter(1));
-  sprintf(sigma_1,"#scale[.75]{#color[2]{#sigma_{1} = %.3f}}",gausfit_lowertheta->GetParameter(2));
-  sprintf(sigma_2,"#scale[.75]{#color[2]{#sigma_{2} = %.3f}}",gausfit_uppertheta->GetParameter(2));
-  latex.DrawLatex(.1,205,mu_1);
-  latex.DrawLatex(.1,185,sigma_1);
-  latex.DrawLatex(.95,205,mu_2);
-  latex.DrawLatex(.95,185,sigma_2);
+  char mu_1[50], mu_2[50], sigma_1[50], sigma_2[50];
+  sprintf(mu_1,"#scale[.75]{#color[2]{#mu_{1} = %.3f #pm %.3f}}", gausfit_lowertheta->GetParameter(1), gausfit_lowertheta->GetParError(1));
+  sprintf(mu_2,"#scale[.75]{#color[2]{#mu_{2} = %.3f #pm %.3f}}", gausfit_uppertheta->GetParameter(1), gausfit_uppertheta->GetParError(1));
+  sprintf(sigma_1,"#scale[.75]{#color[2]{#sigma_{1} = %.3f #pm %.3f}}", gausfit_lowertheta->GetParameter(2), gausfit_lowertheta->GetParError(2));
+  sprintf(sigma_2,"#scale[.75]{#color[2]{#sigma_{2} = %.3f #pm %.3f}}", gausfit_uppertheta->GetParameter(2), gausfit_uppertheta->GetParError(2));
+  latex.DrawLatex(.03,205,mu_1);
+  latex.DrawLatex(.03,185,sigma_1);
+  latex.DrawLatex(.285,205,mu_2);
+  latex.DrawLatex(.285,185,sigma_2);
   c6->SaveAs("outputfiles/temp_angular.pdf");
   c6->SaveAs("outputfiles/temp_angular.root");
   hist_angular->SaveAs("outputfiles/temp_hist_angular.root");
