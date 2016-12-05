@@ -19,6 +19,7 @@
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TCanvas.h>
+#include <TPaveStats.h>
 #include <TLatex.h>
 #include <TLegend.h>
 #include <TMath.h>
@@ -364,8 +365,8 @@ int main(int argc, char** argv) {
   
   const unsigned int nChannels = channel_endPos-channel_startPos+1;
   const int markerVal = -1e4; // for marking unused bins/entries
-  const int min       = -30,
-            max       = 150,
+  const int min       = -15,
+            max       = 180,
             binnumber = (abs(min)+abs(max));
 
   TFile* file = TFile::Open(filename);
@@ -507,7 +508,8 @@ int main(int argc, char** argv) {
       fr[0] = 0.4*hist_spectrum->GetMean();
     }
     if(!isLangausFitRange_end) {
-      fr[1] = 3.0*hist_spectrum->GetMean();
+      float temp_mean = hist_spectrum->GetMean();
+      fr[1] = (3*temp_mean < max) ? 3*temp_mean : max;
     }
 
     // "Width","MP","Area","GSigma":
@@ -532,19 +534,29 @@ int main(int argc, char** argv) {
 	      << "(time taken: " << (double)(clock()-tStart)/CLOCKS_PER_SEC << " seconds)" << std::endl;
 
     // Global style settings
-    gStyle->SetOptStat(1111);
+    gStyle->SetOptStat("eMR");
     gStyle->SetOptFit(111);
     gStyle->SetLabelSize(0.03,"x");
     gStyle->SetLabelSize(0.03,"y");
-
+    
     if(doConvertADC) {
       hist_spectrum->SetXTitle("Amplitude / (ke)");
     }else {
       hist_spectrum->SetXTitle("Amplitude / (ADC)");
     }
     hist_spectrum->SetYTitle("Counts / (#Delta amplitude)");
+    hist_spectrum->GetXaxis()->SetTitleOffset(1.2);
     hist_spectrum->GetYaxis()->SetTitleOffset(1.2);
     hist_spectrum->Draw("e1 x0");
+    TPaveStats *st = (TPaveStats*)hist_spectrum->FindObject("stats");
+    if(st != NULL) {
+      st->SetY1NDC(.5);
+      st->SetY2NDC(.95);
+      st->SetX1NDC(.6);
+      st->SetX2NDC(.95);
+    }else {
+      std::cout << "Warning: Null pointer to TPaveStats object." << std::endl;
+    }
     fitsnr->Draw("lsame");
   }
 
