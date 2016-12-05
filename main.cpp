@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
   TString filename, calibrationFileName;
 
   float SNRThreshold;
-  Double_t sv[4], pllo[4], plhi[4], fp[4], fpe[4]; // parameters for Landau*Gauss fit
+  Double_t sv[4], pllo[4], plhi[4], fp[4], fpe[4], fr[2]; // parameters for Landau*Gauss fit
 
   // default values:
   TString outFileName = "output_";
@@ -63,6 +63,8 @@ int main(int argc, char** argv) {
   bool doCommonModeCorrection = true;
   bool doSetSNRThreshold = false;
   bool doLangausFit = false;
+  bool isLangausFitRange_start = false;
+  bool isLangausFitRange_end = false;
   bool isLangausXiLower = false;
   bool isLangausXiUpper = false;
   bool isLangausMPVLower = false;
@@ -253,6 +255,14 @@ int main(int argc, char** argv) {
       if(identifier.BeginsWith("LANGAUS")) {
 	std::string value_str;
 	value_str = value;
+	if(identifier == "LANGAUS_FITRANGE_START") {
+	  isLangausFitRange_start = true;
+	  fr[0] = std::atof(value_str.c_str());
+	}
+	if(identifier == "LANGAUS_FITRANGE_END") {
+	  isLangausFitRange_end = true;
+	  fr[1] = std::atof(value_str.c_str());
+	}
 	if(identifier == "LANGAUS_XI_LOWER") {
 	  isLangausXiLower = true;
 	  pllo[0] = std::atof(value_str.c_str());
@@ -331,6 +341,8 @@ int main(int argc, char** argv) {
   CRprintInfo(doCommonModeCorrection, "Common-mode correction");
   CRprintInfo(doSubtractBackground, "Background subtraction");
   CRprintInfo(doLangausFit, "Landau*Gauss fit to signal distribution");
+  if(isLangausFitRange_start) CRprintInfo((float)fr[0], "Landau*Gauss fit range start");
+  if(isLangausFitRange_end) CRprintInfo((float)fr[1], "Landau*Gauss fit range end");
   CRprintInfo((doLangausFit && isLangausRanges && isLangausStartValues), "All parameters for the Landau*Gauss fit set successfully");
   CRprintInfo(doSetSNRThreshold, "SNR threshold setting");
   if(doSetSNRThreshold) {
@@ -491,9 +503,12 @@ int main(int argc, char** argv) {
     TF1 *fitsnr = new TF1();
 
     // Setting fit range and start values
-    Double_t fr[2];
-    fr[0]=0.35*hist_spectrum->GetMean();
-    fr[1]=3.0*hist_spectrum->GetMean();
+    if(!isLangausFitRange_start) {
+      fr[0] = 0.4*hist_spectrum->GetMean();
+    }
+    if(!isLangausFitRange_end) {
+      fr[1] = 3.0*hist_spectrum->GetMean();
+    }
 
     // "Width","MP","Area","GSigma":
     if(!isLangausRanges) {
