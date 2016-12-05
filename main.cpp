@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
   unsigned int timeCut_lower = 0;
   unsigned int timeCut_upper = 25;
   unsigned int maxClusterSize = 1;
-  int scaleCutValue = 10;
+  float scaleCutValue = 20.;
   bool isMacroFile = false;
   bool doConvertADC = false;
   bool doSubtractBackground = true;
@@ -234,8 +234,8 @@ int main(int argc, char** argv) {
 	}
       }
       if(identifier == "SCALECUTVALUE") {
-	if(value.IsDigit()) {
-	  scaleCutValue = value.Atoi();
+	if(value.IsFloat()) {
+	  scaleCutValue = value.Atof();
 	  //std::cout << "Scale cut value set to " << scaleCutValue << "..." << std::endl;
 	}else {
 	  std::cout << "   WARNING: 'SCALECUTVALUE = " << value << "' is an invalid input. The default value will be used." << std::endl;
