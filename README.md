@@ -2,8 +2,6 @@
 
 A Cluster Reconstruction Algorithm for Silicon Microstrip Sensors as Used by the CBM-STS Collaboration at GSI/FAIR
 
-*Disclaimer: This project is in its early stages and under heavy development.*
-
 ## General remarks about the program:
 - The used ROOT version is 6.08/00.
 - A Doxyfile is provided so that a documentation can easily be generated using Doxygen.

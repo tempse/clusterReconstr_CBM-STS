@@ -2,7 +2,7 @@
  * \brief This is the main routine of the cluster reconstruction algorithm. It reads a macro file, imports its parameters, performs the cluster reconstruction algorithm and outputs the results.
  *
  * \author Sebastian Templ <sebastian.templ@gmail.com>
- * \date 2016
+ * \date 2017
  */
 
 
@@ -117,9 +117,9 @@ int main(int argc, char** argv) {
       if(currentLine_temp.empty()) continue;
       currentLine.ReplaceAll(" ", "");
       TString identifier = currentLine;
-      identifier.Remove(identifier.First('='), identifier.Length());
+      identifier.Remove(identifier.First('='), identifier.Length()); // only spare the text to the left of the "=" symbol
       TString value = currentLine;
-      value.Remove(0, value.Last('=')+1);
+      value.Remove(0, value.Last('=')+1); // only spare the text to the right of the "=" symbol
       value = value.Strip(TString::kBoth, '\"');
 
       if(identifier == "ROOTFILENAME") {
@@ -140,7 +140,6 @@ int main(int argc, char** argv) {
       if(identifier == "CHANNEL_START") {
 	if(value.IsDigit()) {
 	  channel_startPos = value.Atoi();
-	  //std::cout << "First channel number set to " << channel_startPos << "..." << std::endl;
 	}else {
 	  std::cout << "   ERROR: 'CHANNEL_START = " << value << "' is an invalid input." << std::endl;
 	  return 3;
@@ -149,7 +148,6 @@ int main(int argc, char** argv) {
       if(identifier == "CHANNEL_END") {
 	if(value.IsDigit()) {
 	  channel_endPos = value.Atoi();
-	  //std::cout << "Last channel number set to " << channel_endPos << "..." << std::endl;
 	}else {
 	  std::cout << "   ERROR: 'CHANNEL_END = " << value << "' is an invalid input." << std::endl;
 	  return 3;
@@ -158,7 +156,6 @@ int main(int argc, char** argv) {
       if(identifier == "NBINS") {
 	if(value.IsDigit()) {
 	  nBins = value.Atoi();
-	  //std::cout << "Total number of bins set to " << nBins << "..." << std::endl;
 	}else {
 	  std::cout << "   WARNING: 'NBINS = " << value << "' is an invalid input. The default value will be used." << std::endl;
 	}
@@ -168,7 +165,6 @@ int main(int argc, char** argv) {
 	  isSetTimeCuts = true;
 	  isSetTimeCut_lower = true;
 	  timeCut_lower = value.Atoi();
-	  //std::cout << "Lower time cut value set to " << timeCut_lower << "..." << std::endl;
 	  if(isSetTimeCut_upper && (timeCut_lower >= timeCut_upper)) {
 	    std::cout << "   ERROR: Invalid input for the time cut values." << std::endl;
 	    return 3;
@@ -182,7 +178,6 @@ int main(int argc, char** argv) {
 	  isSetTimeCuts = true;
 	  isSetTimeCut_upper = true;
 	  timeCut_upper = value.Atoi();
-	  //std::cout << "Upper time cut value set to " << timeCut_upper << "..." << std::endl;
 	  if(isSetTimeCut_lower && (timeCut_lower >= timeCut_upper)) {
 	    std::cout << "   ERROR: Invalid input for the time cut values." << std::endl;
 	    return 3;
@@ -194,7 +189,6 @@ int main(int argc, char** argv) {
       if(identifier == "MAXCLUSTERSIZE") {
 	if(value.IsDigit()) {
 	  maxClusterSize = value.Atoi();
-	  //std::cout << "Maximum cluster size set to " << maxClusterSize << "..." << std::endl;
 	}else {
 	  std::cout << "   ERROR: 'MAXCLUSTERSIZE = " << value << "' is an invalid input." << std::endl;
 	  return 3;
@@ -204,10 +198,8 @@ int main(int argc, char** argv) {
 	value.ToLower();
 	if(value == "yes") {
 	  doCommonModeCorrection = true;
-	  //std::cout << "A common-mode correction will be performed..." << std::endl;
 	}else if(value == "no") {
 	  doCommonModeCorrection = false;
-	  //std::cout << "A common-mode correction won't be performed..." << std::endl;
 	}else {
 	  std::cout << "   WARNING: 'COMMONMODECORRECTION = " << value << "' is an invalid input. The default value will be used." << std::endl;
 	}
@@ -216,7 +208,6 @@ int main(int argc, char** argv) {
 	if(value.IsFloat()) {
 	  doSetSNRThreshold = true;
 	  SNRThreshold = value.Atof();
-	  //std::cout << "SNR threshold set to " << SNRThreshold << "..." << std::endl;
 	}else {
 	  std::cout << "   WARNING: 'SNRTHRESHOLD = " << value << "' is an invalid input. No threshold set." << std::endl;
 	}
@@ -225,10 +216,8 @@ int main(int argc, char** argv) {
 	value.ToLower();
 	if(value == "yes") {
 	  doSubtractBackground = true;
-	  //std::cout << "The estimated background will be subtracted..." << std::endl;
 	}else if(value == "no") {
 	  doSubtractBackground = false;
-	  //std::cout << "The estimated background won't be subtracted..." << std::endl;
 	}else {
 	  std::cout << "   WARNING: 'SUBTRACTBACKGROUND = " << value << "' is an invalid input. The default value will be used." << std::endl;
 	}
@@ -236,7 +225,6 @@ int main(int argc, char** argv) {
       if(identifier == "SCALECUTVALUE") {
 	if(value.IsFloat()) {
 	  scaleCutValue = value.Atof();
-	  //std::cout << "Scale cut value set to " << scaleCutValue << "..." << std::endl;
 	}else {
 	  std::cout << "   WARNING: 'SCALECUTVALUE = " << value << "' is an invalid input. The default value will be used." << std::endl;
 	}
@@ -245,10 +233,8 @@ int main(int argc, char** argv) {
 	value.ToLower();
 	if(value == "yes") {
 	  doLangausFit = true;
-	  //std::cout << "A fit with a Landau-Gauss convolution function will be performed..." << std::endl;
 	}else if(value == "no") {
 	  doLangausFit = false;
-	  //std::cout << "A fit with a Landau-Gauss convolution function won't be performed..." << std::endl;
 	}else {
 	  std::cout << "   WARNING: 'LANGAUSFIT = " << value << "' is an invalid input. The default value will be used." << std::endl;
 	}
@@ -315,6 +301,7 @@ int main(int argc, char** argv) {
       }
     }
   }
+  // prepare boolean variables to check whether all the Langaus fit parameters are set properly:
   if(isLangausXiLower && isLangausXiUpper &&
      isLangausMPVLower && isLangausMPVUpper &&
      isLangausAreaLower && isLangausAreaUpper &&
@@ -325,9 +312,7 @@ int main(int argc, char** argv) {
     isLangausStartValues = true;
   }
   if(doLangausFit) {
-    if(isLangausRanges && isLangausStartValues) {
-      //std::cout << "Parameters for the Landau*Gauss fit set..." << std::endl;
-    }else if(!isLangausRanges) {
+    if(!isLangausRanges) {
       std::cout << "   WARNING: Not all ranges for the Landau*Gauss fit were set properly. Default values will be used." << std::endl;
     }else if(!isLangausStartValues) {
       std::cout << "   WARNING: Not all start values for the Landau*Gauss fit were set properly. Default values will be used." << std::endl;
@@ -362,12 +347,15 @@ int main(int argc, char** argv) {
   
 
   ///////////////////////////////////////////////////////////////////
+  // File import and preparations for cluster data generation:
+  /////////////////////////////////////////////////////////////
+
   
   const unsigned int nChannels = channel_endPos-channel_startPos+1;
   const int markerVal = -1e4; // for marking unused bins/entries
   const int min       = -15,
             max       = 180,
-            binnumber = (abs(min)+abs(max));
+            binnumber = (abs(min)+abs(max)); // bin parameters for histograms
 
   TFile* file = TFile::Open(filename);
   TTree* tree = (TTree*) file->Get("tree");
@@ -396,6 +384,10 @@ int main(int argc, char** argv) {
   TH1F *hist_clusterSizeDistr = new TH1F("hist_clusterSizeDistr","",maxClusterSize,1,maxClusterSize+1);
   TH1F *hist_clusterSizeDistr_background = new TH1F("hist_clusterSizeDistr_background","",maxClusterSize,1,maxClusterSize+1);
 
+  // The vector CREventCollection will eventually store the entire cluster data.
+  // Data structure: Each vector element is a CREvent object which, in turn, holds all the CREntry objects
+  // of the respective event. A CREntry object is the smallest "logical data unit" and contains all the
+  // information necessary to characterize a given cluster (e.g., cluster size, position, amplitudes,...)
   std::vector<CREvent> CREventCollection;
 
   // Import and store ADC->ke conversion values and convert the noise distribution, if the option is enabled:
@@ -408,8 +400,11 @@ int main(int argc, char** argv) {
     }
   }
 
- ///////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////
+  // Cluster data generation:
+  /////////////////////////////////////////////////////////////
 
+  
   unsigned int nEv = tree->GetEntries();
   std::cout << "\rMaking preparations... DONE" << std::endl;
   std::cout << "Starting cluster reconstruction algorithm..." << std::endl << std::endl;
@@ -437,12 +432,17 @@ int main(int argc, char** argv) {
       for(unsigned int i=0;i<nBins;i++) amplitude[i] -= median;
     }
 
+    // This CREvent object will eventually store all CREntry objects of the given event:
     CREvent *currentCREvent = new CREvent(nChannels, amplitude, nBins);
 
+    // The generation of the cluster data happens in the following. Instances of CREntry are created
+    // for all possible channel combinations and subsequently added to the current CREvent object.
+    // Finally, the cluster data of the current event is added to the event data collection (i.e., the
+    // CREventCollection vector.
     for(unsigned int channel=channel_startPos; channel<=channel_endPos; channel++) {
       for(unsigned int clusterSize=1; clusterSize<=maxClusterSize; clusterSize++) {
 	float amplitudeOfCluster = 0., noiseOfCluster = 0.;
-	if(channel+(clusterSize-1) <= channel_endPos) { // prevent array overfloats
+	if(channel+(clusterSize-1) <= channel_endPos) { // prevent array overflows
 	  for(unsigned int nn=0; nn<clusterSize; nn++) {
 	    amplitudeOfCluster += amplitude[(channel-1)+nn]; // amplitudeOfCluster = a_1 + a_2 + ...
 	    noiseOfCluster += TMath::Power(hist_noise->GetBinContent(channel+nn),2); // noiseOfCluster^2 = delta_a_1^2 + delta_a_2^2 + ...
@@ -455,14 +455,15 @@ int main(int argc, char** argv) {
     }
     CREventCollection.push_back(*currentCREvent);
 
-    if(doSetSNRThreshold) {
-      if(currentCREvent->getMostSignCREntry().getSignificanceOfCluster() >= SNRThreshold) { // set SNR threshold
+    // Filling the histograms:
+    if(doSetSNRThreshold) { // set SNR threshold
+      if(currentCREvent->getMostSignCREntry().getSignificanceOfCluster() >= SNRThreshold) {
 	hist_clusterSizeDistr->Fill(currentCREvent->getMostSignCREntry().getClusterSize());
 	hist_clusterSizeDistr_background->Fill(currentCREvent->getLeastSignCREntry().getClusterSize());
 	hist_spectrum->Fill(currentCREvent->getMostSignCREntry().getAmplitudeOfCluster());
 	hist_background->Fill(-currentCREvent->getLeastSignCREntry().getAmplitudeOfCluster());
       }
-    }else {
+    }else { // no SNR threshold
       hist_clusterSizeDistr->Fill(currentCREvent->getMostSignCREntry().getClusterSize());
       hist_clusterSizeDistr_background->Fill(currentCREvent->getLeastSignCREntry().getClusterSize());
       hist_spectrum->Fill(currentCREvent->getMostSignCREntry().getAmplitudeOfCluster());
@@ -476,14 +477,15 @@ int main(int argc, char** argv) {
 
 
   ///////////////////////////////////////////////////////////////////
-  
+  // Signal reconstruction procedure:
+  /////////////////////////////////////////////////////////////
+
   
   unsigned int integral_upperBoundary = scaleCutValue-min;
   float scaleVal = (hist_spectrum->Integral(1,integral_upperBoundary))/(hist_background->Integral(1,integral_upperBoundary));
   if(doSubtractBackground) CRprintInfo(scaleVal, "Calculated scale value for the background distribution");
   hist_background->Scale(scaleVal);
   hist_clusterSizeDistr_background->Scale(scaleVal);
-  hist_background->Sumw2(); // necessary after histogram scaling
   TCanvas *c = new TCanvas("c","",800,600);
   c->SetGrid();
   hist_spectrum->Draw("e1 x0");
@@ -503,7 +505,7 @@ int main(int argc, char** argv) {
     tStart = clock();
     TF1 *fitsnr = new TF1();
 
-    // Setting fit range and start values
+    // Setting fit range and start values:
     if(!isLangausFitRange_start) {
       fr[0] = 0.4*hist_spectrum->GetMean();
     }
@@ -519,7 +521,6 @@ int main(int argc, char** argv) {
     }
     if(!isLangausStartValues) {
       sv[0]=2.; sv[1]=20.; sv[2]=5e4; sv[3]=5.;
-      // sv[0]=1.8; sv[1]=20.0; sv[2]=50000.0; sv[3]=3.0;
     }
     Double_t chisqr;
     Int_t    ndf;
@@ -533,7 +534,7 @@ int main(int argc, char** argv) {
     std::cout << "Performing fit with Landau-Gauss convolution function... DONE " 
 	      << "(time taken: " << (double)(clock()-tStart)/CLOCKS_PER_SEC << " seconds)" << std::endl;
 
-    // Global style settings
+    // Global style settings:
     gStyle->SetOptStat("eMR");
     gStyle->SetOptFit(111);
     gStyle->SetLabelSize(0.03,"x");
@@ -562,6 +563,7 @@ int main(int argc, char** argv) {
 
   c->SaveAs("outputfiles/temp_signal.root");
   c->SaveAs("outputfiles/temp_signal.pdf");
+
   
   TCanvas *c2 = new TCanvas("c2","",800,600);
   c2->SetGridy();
@@ -575,14 +577,14 @@ int main(int argc, char** argv) {
 
 
   // generate further plots related to the charge distribution of two-strip-cluster events:
-  std::vector<CREvent> CREventCollection_2SC;
+  std::vector<CREvent> CREventCollection_2SC; // this vector will eventually contain a subset of the entire cluster data with clusterSize=2
   for(unsigned int ev=0; ev<CREventCollection.size(); ev++) {
     CREventCollection_2SC.push_back(CREventCollection.at(ev).getCREvent_forCS(2));
   }
   int eta_bins = 100, eta_min = 0, eta_max = 1;
   TH1F *hist_eta = new TH1F("hist_eta","",eta_bins,eta_min,eta_max);
   TH1F *hist_eta_background = new TH1F("hist_eta_background","",eta_bins,eta_min,eta_max);
-  TH1F *hist_angular = new TH1F("hist_angular","",90,0,1/2.);
+  TH1F *hist_angular = new TH1F("hist_angular","",90,0,.5);
   int crosstalk_bins = 130, 
     crosstalk_min = -10, 
     crosstalk_max = 120;
@@ -603,7 +605,7 @@ int main(int argc, char** argv) {
       hist_crosstalk->Fill(amp_rightChannel, amp_leftChannel);
       hist_angular->Fill(TMath::ATan(amp_leftChannel/amp_rightChannel)/(TMath::Pi()));
       hist_eta->Fill(eta);
-    }else if(!doSetSNRThreshold && amp_leftChannel*amp_leftChannel+amp_rightChannel*amp_rightChannel >= 400) { //dirty approach: just cut away background part within a circle of certain radius
+    }else if(!doSetSNRThreshold && amp_leftChannel*amp_leftChannel+amp_rightChannel*amp_rightChannel >= 400) { // exclude all events within a circle of given radius
       hist_crosstalk->Fill(amp_rightChannel, amp_leftChannel);
       hist_angular->Fill(TMath::ATan(amp_leftChannel/amp_rightChannel)/(TMath::Pi()));
       hist_eta->Fill(eta);
@@ -619,13 +621,12 @@ int main(int argc, char** argv) {
 
   if(doSubtractBackground) {
     hist_crosstalk_background->Scale(scaleVal);
-    hist_crosstalk_background->Sumw2();
     //hist_crosstalk->Add(hist_crosstalk_background,-1);
 
     hist_eta_background->Scale(scaleVal);
-    hist_eta_background->Sumw2();
     //hist_eta->Add(hist_eta_background,-1);
   }
+  
   TCanvas *c3 = new TCanvas("c3","",800,600);
   c3->SetGrid();
   hist_eta->SetXTitle("#eta_{ (m=2)}");
@@ -637,6 +638,7 @@ int main(int argc, char** argv) {
   c3->SaveAs("outputfiles/temp_eta.pdf");
   c3->SaveAs("outputfiles/temp_eta.root");
 
+  /*
   TCanvas *c3_2 = new TCanvas("c3_2","",800,600);
   c3_2->SetGrid();
   hist_eta_background->SetXTitle("#eta_{ (m=2)}");
@@ -647,8 +649,9 @@ int main(int argc, char** argv) {
   hist_eta_background->SaveAs("outputfiles/temp_hist_eta_background.root");
   c3_2->SaveAs("outputfiles/temp_eta_background.pdf");
   c3_2->SaveAs("outputfiles/temp_eta_background.root");
-
-  TCanvas *c4 = new TCanvas("c4","",800,600);
+  */
+  
+  TCanvas *c4 = new TCanvas("c4","",800,800);
   c4->SetGrid();
   if(doConvertADC) {
     hist_crosstalk->SetXTitle("a_{R} / (ke)");
@@ -657,6 +660,8 @@ int main(int argc, char** argv) {
     hist_crosstalk->SetXTitle("a_{R} / (ADC)");
     hist_crosstalk->SetYTitle("a_{L} / (ADC)");
   }
+  hist_crosstalk->GetYaxis()->SetTitleOffset(1.45);
+  hist_crosstalk->GetXaxis()->SetTitleOffset(1.2);
   hist_crosstalk->SetStats(kFALSE);
   hist_crosstalk->Draw("colz");
   c4->SaveAs("outputfiles/temp_crosstalk.pdf");
@@ -664,7 +669,7 @@ int main(int argc, char** argv) {
   hist_crosstalk->SaveAs("outputfiles/temp_hist_crosstalk.root");
 
   
-  TCanvas *c5 = new TCanvas("c5","",800,600);
+  TCanvas *c5 = new TCanvas("c5","",800,800);
   c5->SetGrid();
   if(doConvertADC) {
     hist_crosstalk_background->SetXTitle("a_{R} / (ke)");
@@ -673,17 +678,20 @@ int main(int argc, char** argv) {
     hist_crosstalk_background->SetXTitle("a_{R} / (ADC)");
     hist_crosstalk_background->SetYTitle("a_{L} / (ADC)");
   }
+  hist_crosstalk_background->GetYaxis()->SetTitleOffset(1.45);
+  hist_crosstalk_background->GetXaxis()->SetTitleOffset(1.2);
   hist_crosstalk_background->SetStats(kFALSE);
   hist_crosstalk_background->Draw("colz");
   c5->SaveAs("outputfiles/temp_crosstalk_background.pdf");
   c5->SaveAs("outputfiles/temp_crosstalk_background.root");
   hist_crosstalk_background->SaveAs("outputfiles/temp_hist_crosstalk_background.root");
+
   
-  TCanvas *c6 = new TCanvas("c6","",800,600);
+  TCanvas *c6 = new TCanvas("c6","",800,800);
   c6->SetGrid();
   hist_angular->SetXTitle("#theta/#pi");
   hist_angular->SetYTitle("Counts");
-  hist_angular->GetYaxis()->SetTitleOffset(1.2);
+  hist_angular->GetYaxis()->SetTitleOffset(1.45);
   hist_angular->SetStats(kFALSE);
   float leftPeak_fitRange_start = .021,
     leftPeak_fitRange_end = .101,
@@ -693,7 +701,7 @@ int main(int argc, char** argv) {
   gausfit_lowertheta->SetParameters(100.,.06,.03);
   hist_angular->Fit("gausfit_lowertheta","","",leftPeak_fitRange_start,leftPeak_fitRange_end);
   TF1 *gausfit_uppertheta = new TF1("gausfit_uppertheta","[0]*exp(-.5*((x-[1])/[2])**2)",rightPeak_fitRange_start,rightPeak_fitRange_end);
-  gausfit_uppertheta->SetParameters(180.,.45,.03);
+  gausfit_uppertheta->SetParameters(180.,.45,.01);
   hist_angular->Fit("gausfit_uppertheta","+","",rightPeak_fitRange_start,rightPeak_fitRange_end);
   hist_angular->Draw("e");
   TLatex latex;
@@ -702,10 +710,11 @@ int main(int argc, char** argv) {
   sprintf(mu_2,"#scale[.75]{#color[2]{#mu_{2} = %.3f #pm %.3f}}", gausfit_uppertheta->GetParameter(1), gausfit_uppertheta->GetParError(1));
   sprintf(sigma_1,"#scale[.75]{#color[2]{#sigma_{1} = %.3f #pm %.3f}}", gausfit_lowertheta->GetParameter(2), gausfit_lowertheta->GetParError(2));
   sprintf(sigma_2,"#scale[.75]{#color[2]{#sigma_{2} = %.3f #pm %.3f}}", gausfit_uppertheta->GetParameter(2), gausfit_uppertheta->GetParError(2));
-  latex.DrawLatex(.03,205,mu_1);
-  latex.DrawLatex(.03,185,sigma_1);
-  latex.DrawLatex(.285,205,mu_2);
-  latex.DrawLatex(.285,185,sigma_2);
+  float textPos_vertical = 221;
+  latex.DrawLatex(.03,textPos_vertical,mu_1);
+  latex.DrawLatex(.03,textPos_vertical*.9,sigma_1);
+  latex.DrawLatex(.285,textPos_vertical,mu_2);
+  latex.DrawLatex(.285,textPos_vertical*.9,sigma_2);
   c6->SaveAs("outputfiles/temp_angular.pdf");
   c6->SaveAs("outputfiles/temp_angular.root");
   hist_angular->SaveAs("outputfiles/temp_hist_angular.root");

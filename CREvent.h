@@ -86,7 +86,7 @@ class CREvent : public CREntry {
    */
   CREvent getCREvent_forMaxCS(unsigned int maxClusterSize /*!< The maximum cluster size to be considered. All CREntry objects having this cluster size or a smaller one are selected by the function. */);
 
-  //! Function to generate a subset of the CREntry collection (i. e., the CREvent object) of a signle event with given cluster sizes.
+  //! Function to generate a subset of the CREntry collection (i. e., the CREvent object) of a single event with given cluster sizes.
   /*!
    * The function loops over the whole collection of CREntry objects of a given event, selects the ones having a given cluster size and returns them as a new CREvent object.
    * \return A new CREvent object holding only the CREntry objects with a given cluster size.

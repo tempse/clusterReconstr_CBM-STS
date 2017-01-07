@@ -21,25 +21,25 @@ TIMECUT_LOWER = 15
 TIMECUT_UPPER = 20
 
 ### Maximally-allowed cluster size [unsigned int]:
-MAXCLUSTERSIZE = 5
+MAXCLUSTERSIZE = 4
 
 ### Perform a common-mode correction? [yes/no]:
 COMMONMODECORRECTION = yes
 
-### Set a threshold on the SNR value (comment for not setting any threshold) [float]:
-SNRTHRESHOLD = 4
+### Set a threshold on the SNR value (comment line for not setting any threshold) [float]:
+#SNRTHRESHOLD = 4
 
 ### Subtract the estimated background? [yes/no]:
-SUBTRACTBACKGROUND = no
+SUBTRACTBACKGROUND = yes
 
 ### Scale cut value (for scaling the background estimation) [int]:
-SCALECUTVALUE = 15
+SCALECUTVALUE = 25
 
 ### Fit the signal with a Landau-Gauss convolution function? (Only makes sense if the background has gotten rid of) [yes/no]:
 LANGAUSFIT = yes
 
 ### Fit ranges of the Landau*Gauss fit (comment lines if default values relative to the distribution mean should be used) [float]:
-LANGAUS_FITRANGE_START = 33
+LANGAUS_FITRANGE_START = 30
 #LANGAUS_FITRANGE_END = 150
 
 ###### Fit parameter ranges for Landau*Gauss fit [float]:
